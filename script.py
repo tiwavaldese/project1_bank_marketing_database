@@ -20,10 +20,18 @@ campaign['campaign_outcome'] = campaign['campaign_outcome'].map({'sucess': 1,'fa
 values = 1
 campaign['campaign_id'] = values
 campaign['year'] = '2022'
+# Capitalize month column
+campaign["month"] = campaign["month"].str.capitalize()
+# Convert day to string
+campaign["day"] = campaign["day"].astype(str)
+# Add last_contact_date column
 campaign['last_contact_date'] = pd.read_csv(campaign['day']) + '-' + campaign['month'] + '-' + campaign['month']
+# Convert to datetime
 campaign['last_contact_date'] = pd.to_datetime(campaign['last_contact_date'], format ='%d-%b-%Y')
-client.drop(columns = ['month','day', inplace= True])
-client = pd.DataFrame('client.csv','campaign.csv','economics.csv', index =False)
+client.drop(columns = ['month','day','year'], inplace= True)
+client.csv('client.csv',index =False)
+campaign.csv('campaign.csv',index =False)
+economics.csv('economics.csv',index =False)
 client_table =""" CREATE TABLE client
 (id,
 age,
@@ -33,7 +41,7 @@ education,
 credit_default,
 housing,
 loan)
-\copy client from 'client.csv' DELIMITER ',' csv HEADER
+\copy client from 'client.csv' DELIMITER ',' CSV HEADER
 """
 campaign_table =""" CREATE TABLE campaign
 (client_id,
@@ -45,7 +53,7 @@ previous_outcome,
 campaign_outcome,
 number_contacts
 )
-\copy campaign from 'campaign.csv' DELIMITER ',' csv HEADER
+\copy campaign from 'campaign.csv' DELIMITER ',' CSV HEADER
 """
 economics_table =""" CREATE TABLE economics
 (client_id,
@@ -54,5 +62,5 @@ cons_price_idx,
 euribor_three_months,
 number_employed
 )
-\copy economics from 'economics.csv' DELIMITER ',' csv HEADER
+\copy economics from 'economics.csv' DELIMITER ',' CSV HEADER
 """
