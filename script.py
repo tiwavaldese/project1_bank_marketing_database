@@ -4,9 +4,9 @@ import numpy as np
 df = pd.read_csv('bank_marketing.csv')
 client = df[["client_id", "age", "job", "marital", "education", 
              "credit_default", "housing", "loan"]]
-campaign = df[["client_id", "campaign", "month", "day", 
+campaign = df[["client_id","campaign", "month", "day", 
                "duration", "pdays", "previous", "poutcome", "y"]]
-economics = df[["client_id", "emp_var_rate", "cons_price_idx", 
+economics = df[["client_id","emp_var_rate", "cons_price_idx", 
                 "euribor3m", "nr_employed"]]
 client.rename(columns = {'client_id':id}, inplace =True)
 campaign.rename(columns = {'duration':'contact_duration','previous':'previous_campaign_contacts','y':'campaign_outcome','poutcome':'previous_outcome','campaign':'number_contacts'}, inplace = True)
@@ -23,3 +23,36 @@ campaign['year'] = '2022'
 campaign['last_contact_date'] = pd.read_csv(campaign['day']) + '-' + campaign['month'] + '-' + campaign['month']
 campaign['last_contact_date'] = pd.to_datetime(campaign['last_contact_date'], format ='%d-%b-%Y')
 client.drop(columns = ['month','day', inplace= True])
+client = pd.DataFrame('client.csv','campaign.csv','economics.csv', index =False)
+client_table =""" CREATE TABLE client
+(id,
+age,
+job,
+marital,
+education,
+credit_default,
+housing,
+loan)
+\copy client from 'client.csv' DELIMITER ',' csv HEADER
+"""
+campaign_table =""" CREATE TABLE campaign
+(client_id,
+campaign,
+month,
+day,
+previous_campaign_contacts,
+previous_outcome,
+campaign_outcome,
+number_contacts
+)
+\copy campaign from 'campaign.csv' DELIMITER ',' csv HEADER
+"""
+economics_table =""" CREATE TABLE economics
+(client_id,
+emp_var_rate,
+cons_price_idx,
+euribor_three_months,
+number_employed
+)
+\copy economics from 'economics.csv' DELIMITER ',' csv HEADER
+"""
